@@ -6,23 +6,29 @@
     <title>RideDirect - Ride Hailing</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React and Babel -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide Icons UMD -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-        const { 
-          Car, MapPin, Phone, MessageSquare, Shield, Star, 
-          CreditCard, Smartphone, CheckCircle, AlertCircle, 
-          DollarSign, RefreshCw, User, Compass, ArrowRight, X 
-        } = lucide;
+        
+        // Safe icon fallback wrapper
+        const getIcon = (name, props) => {
+            const iconLib = window.Lucide;
+            if (iconLib && iconLib[name]) {
+                const IconComponent = iconLib[name];
+                return <IconComponent {...props} />;
+            }
+            return <span {...props}>•</span>;
+        };
 
         function App() {
           const [mode, setMode] = useState('passenger');
@@ -66,7 +72,7 @@
             let animationFrameId;
             const renderMap = () => {
               ctx.clearRect(0, 0, canvas.width, canvas.height);
-              ctx.strokeStyle = '#e5e7eb';
+              ctx.strokeStyle = '#334155';
               ctx.lineWidth = 4;
               for (let i = 0; i < canvas.width; i += 40) {
                 ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
@@ -89,10 +95,8 @@
 
               const carX = (driverPos.x / 100) * canvas.width;
               const carY = (driverPos.y / 100) * canvas.height;
-              ctx.fillStyle = '#1E40AF';
+              ctx.fillStyle = '#3B82F6';
               ctx.beginPath(); ctx.arc(carX, carY, 14, 0, Math.PI * 2); ctx.fill();
-              ctx.fillStyle = '#FFFFFF'; ctx.font = '10px sans-serif';
-              ctx.fillText('CAR', carX - 10, carY + 3);
 
               animationFrameId = requestAnimationFrame(renderMap);
             };
@@ -147,8 +151,8 @@
             <div className="min-h-screen bg-slate-900 text-slate-100 font-sans flex flex-col">
               <header className="bg-slate-800 border-b border-slate-700 p-4 flex justify-between items-center sticky top-0 z-50">
                 <div className="flex items-center space-x-2">
-                  <div className="bg-emerald-500 p-2 rounded-lg text-slate-950">
-                    <Car className="w-6 h-6" />
+                  <div className="bg-emerald-500 p-2 rounded-lg text-slate-950 font-bold">
+                    🚗
                   </div>
                   <div>
                     <h1 className="font-bold text-xl tracking-tight text-white">RideDirect</h1>
@@ -169,23 +173,22 @@
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                       <span>GPS Tracking Active</span>
                     </div>
-                    <div className="absolute top-4 right-4 bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-xs flex items-center space-x-2">
-                      <Smartphone className="w-4 h-4 text-emerald-400" />
+                    <div className="absolute top-4 right-4 bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-xs flex items-center space-x-2 shadow-lg">
                       <span>Lipa na M-PESA Till: <strong>1620547</strong></span>
                     </div>
                   </div>
 
-                  <div className="bg-slate-800 border-t md:border border-slate-700 p-4 md:rounded-2xl flex flex-col justify-between">
+                  <div className="bg-slate-800 border-t md:border border-slate-700 p-4 md:rounded-2xl flex flex-col justify-between shadow-xl">
                     {tripStatus === 'idle' && (
                       <div className="space-y-4">
                         <h2 className="text-lg font-bold">Request a Ride</h2>
                         <div className="space-y-2">
                           <div className="flex items-center bg-slate-900 border border-slate-700 rounded-xl px-3 py-2">
-                            <MapPin className="w-5 h-5 text-emerald-400 mr-2 shrink-0" />
+                            <span className="text-emerald-400 mr-2">📍</span>
                             <input type="text" value={pickup} onChange={(e) => setPickup(e.target.value)} className="bg-transparent w-full text-sm outline-none text-white" placeholder="Pickup Location" />
                           </div>
                           <div className="flex items-center bg-slate-900 border border-slate-700 rounded-xl px-3 py-2">
-                            <Compass className="w-5 h-5 text-rose-400 mr-2 shrink-0" />
+                            <span className="text-rose-400 mr-2">🎯</span>
                             <input type="text" value={dropoff} onChange={(e) => setDropoff(e.target.value)} className="bg-transparent w-full text-sm outline-none text-white" placeholder="Destination" />
                           </div>
                         </div>
@@ -207,16 +210,15 @@
                           <span className="text-xs text-slate-400">Payment Option</span>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                              <Smartphone className="w-5 h-5 text-emerald-400" />
+                              <span className="text-emerald-400 font-bold">📱</span>
                               <span className="text-sm font-semibold">M-PESA (Till 1620547)</span>
                             </div>
-                            <CheckCircle className="w-4 h-4 text-emerald-400" />
+                            <span className="text-emerald-400">✓</span>
                           </div>
                         </div>
 
-                        <button onClick={() => setTripStatus('searching')} className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl transition flex justify-center items-center space-x-2">
+                        <button onClick={() => setTripStatus('searching')} className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl transition flex justify-center items-center space-x-2 shadow-lg">
                           <span>Request {tiers[selectedTier].name}</span>
-                          <ArrowRight className="w-5 h-5" />
                         </button>
                       </div>
                     )}
@@ -228,7 +230,7 @@
                           <h3 className="font-bold text-lg">Connecting with Nearby Driver...</h3>
                           <p className="text-slate-400 text-xs mt-1">Dispatching request to nearest available vehicle</p>
                         </div>
-                        <button onClick={() => setTripStatus('accepted')} className="bg-emerald-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg">(Simulate Driver Accept)</button>
+                        <button onClick={() => setTripStatus('accepted')} className="bg-emerald-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg shadow">(Simulate Driver Accept)</button>
                       </div>
                     )}
 
@@ -240,20 +242,17 @@
                             <h3 className="font-bold text-base text-white">Samuel M.</h3>
                             <p className="text-xs text-slate-400">Toyota Premio • KDA 489X</p>
                           </div>
-                          <div className="flex items-center space-x-1 text-amber-400">
-                            <Star className="w-4 h-4 fill-amber-400" />
-                            <span className="text-xs font-bold">4.9</span>
+                          <div className="flex items-center space-x-1 text-amber-400 font-bold text-xs">
+                            <span>★ 4.9</span>
                           </div>
                         </div>
 
                         <div className="flex space-x-2">
                           <a href="tel:0712345678" className="flex-1 bg-slate-700 hover:bg-slate-600 p-2.5 rounded-xl flex items-center justify-center space-x-2 text-xs font-semibold">
-                            <Phone className="w-4 h-4 text-emerald-400" />
-                            <span>Call Driver</span>
+                            <span>📞 Call Driver</span>
                           </a>
                           <button onClick={() => setChatOpen(!chatOpen)} className="flex-1 bg-slate-700 hover:bg-slate-600 p-2.5 rounded-xl flex items-center justify-center space-x-2 text-xs font-semibold">
-                            <MessageSquare className="w-4 h-4 text-emerald-400" />
-                            <span>In-App Chat</span>
+                            <span>💬 In-App Chat</span>
                           </button>
                         </div>
 
@@ -267,7 +266,7 @@
                               ))}
                             </div>
                             <form onSubmit={handleSendMessage} className="flex space-x-1 pt-2">
-                              <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type message..." className="flex-1 bg-slate-800 text-xs px-2 py-1.5 rounded-lg outline-none" />
+                              <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type message..." className="flex-1 bg-slate-800 text-xs px-2 py-1.5 rounded-lg outline-none text-white" />
                               <button type="submit" className="bg-emerald-500 text-slate-950 font-bold px-3 py-1 rounded-lg text-xs">Send</button>
                             </form>
                           </div>
@@ -275,7 +274,7 @@
 
                         <div className="space-y-2 pt-4">
                           {tripStatus === 'accepted' && (
-                            <button onClick={() => setTripStatus('enroute')} className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl">Start Trip Progress</button>
+                            <button onClick={() => setTripStatus('enroute')} className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl shadow">Start Trip Progress</button>
                           )}
                           {tripStatus === 'enroute' && (
                             <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 text-center">
@@ -290,103 +289,10 @@
                     {tripStatus === 'completed' && (
                       <div className="space-y-4">
                         <div className="text-center">
-                          <CheckCircle className="w-12 h-12 text-emerald-400 mx-auto" />
+                          <span className="text-4xl">🎉</span>
                           <h3 className="font-bold text-lg mt-2">You Have Arrived!</h3>
                           <p className="text-slate-400 text-xs">Total Fare Due: KES {tiers[selectedTier].price}</p>
                         </div>
 
                         {!stkSuccess ? (
-                          <div className="bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-3">
-                            <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
-                              <Smartphone className="w-5 h-5 text-emerald-400" />
-                              <div>
-                                <p className="font-semibold text-xs">Lipa na M-PESA Online</p>
-                                <p className="text-[10px] text-slate-400">Till Number: 1620547</p>
-                              </div>
-                            </div>
-                            <div>
-                              <label className="text-xs text-slate-400">M-PESA Phone Number</label>
-                              <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" />
-                            </div>
-                            <button onClick={handleStkPush} disabled={isProcessingStk} className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-lg text-sm flex items-center justify-center space-x-2">
-                              {isProcessingStk ? (
-                                <>
-                                  <RefreshCw className="w-4 h-4 animate-spin" />
-                                  <span>Sending STK Prompt...</span>
-                                </>
-                              ) : (
-                                <span>Pay KES {tiers[selectedTier].price} via STK Push</span>
-                              )}
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="bg-emerald-950/60 border border-emerald-500/40 p-4 rounded-xl space-y-2 text-center">
-                            <CheckCircle className="w-8 h-8 text-emerald-400 mx-auto" />
-                            <h4 className="font-bold text-sm text-emerald-300">Payment Completed</h4>
-                            <p className="text-xs text-slate-300">Ref: <strong>{mpesaReceipt}</strong></p>
-                            <p className="text-[11px] text-slate-400">Paid to Buy Goods Till 1620547</p>
-                            <button onClick={() => { setTripStatus('idle'); setStkSuccess(false); }} className="w-full bg-slate-800 hover:bg-slate-700 text-xs text-white py-2 rounded-lg mt-2">Book Another Ride</button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex-1 p-4 max-w-4xl mx-auto w-full space-y-6">
-                  <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 flex justify-between items-center">
-                    <div>
-                      <h2 className="font-bold text-lg">Driver Console</h2>
-                      <p className="text-xs text-slate-400">Personal Car Owner Mode</p>
-                    </div>
-                    <button onClick={() => setIsDriverOnline(!isDriverOnline)} className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-2 ${isDriverOnline ? 'bg-emerald-500 text-slate-950' : 'bg-slate-700 text-slate-300'}`}>
-                      <span className={`w-2 h-2 rounded-full ${isDriverOnline ? 'bg-slate-950' : 'bg-rose-500'}`}></span>
-                      <span>{isDriverOnline ? 'ONLINE (Ready for Rides)' : 'OFFLINE'}</span>
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="bg-slate-800 border border-slate-700 p-4 rounded-2xl">
-                      <span className="text-xs text-slate-400">Today's Earnings</span>
-                      <p className="text-xl font-bold text-emerald-400 mt-1">KES {driverEarnings}</p>
-                    </div>
-                    <div className="bg-slate-800 border border-slate-700 p-4 rounded-2xl">
-                      <span className="text-xs text-slate-400">Completed Trips</span>
-                      <p className="text-xl font-bold text-white mt-1">{completedTripsCount}</p>
-                    </div>
-                    <div className="col-span-2 md:col-span-1 bg-slate-800 border border-slate-700 p-4 rounded-2xl">
-                      <span className="text-xs text-slate-400">Linked Payment Till</span>
-                      <p className="text-sm font-bold text-emerald-400 mt-1">Buy Goods: 1620547</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 space-y-4">
-                    <h3 className="font-bold text-sm flex items-center space-x-2">
-                      <Smartphone className="w-4 h-4 text-emerald-400" />
-                      <span>M-PESA Till Payments Received (Till 1620547)</span>
-                    </h3>
-                    <div className="divide-y divide-slate-700">
-                      {mpesaLogs.map((log) => (
-                        <div key={log.id} className="py-3 flex justify-between items-center text-xs">
-                          <div>
-                            <p className="font-semibold text-white">{log.id}</p>
-                            <p className="text-slate-400">From {log.sender} • {log.time}</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="font-bold text-emerald-400 text-sm">+ KES {log.amount}</span>
-                            <p className="text-[10px] text-emerald-300">{log.status}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        }
-
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-    </script>
-</body>
-</html>
+                          <div className="bg-slate-900 border border-slate-700 p-4 rounded-xl
