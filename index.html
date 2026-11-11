@@ -1,265 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RideDirect - Ride Hailing</title>
-    <link rel="manifest" href="./manifest.json">
-    <script src="https://cdn.tailwindcss.com"></script>
-    AIzaSyAvGXhIZvl5ION4EXIq13uq_eKEo3eg7mI
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RideDirect - Ride Hailing</title>
+  <link rel="manifest" href="./manifest.json">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvGXhIZvl5ION4EXIq13uq_eKEo3eg7mI&libraries=places" async defer></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
-    <header class="bg-slate-800 border-b border-slate-700 p-4 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center space-x-2">
-            <div class="bg-emerald-500 p-2 rounded-lg text-slate-950 font-bold">🚗</div>
+  <header class="bg-slate-800 border-b border-slate-700 p-4 flex justify-between items-center sticky top-0 z-50">
+    <div class="flex items-center space-x-2">
+      <div class="bg-emerald-500 p-2 rounded-lg text-slate-950 font-bold">🚗</div>
+      <div>
+        <h1 class="font-bold text-xl tracking-tight text-white">RideDirect</h1>
+        <p class="text-xs text-slate-400">Till: 1620547</p>
+      </div>
+    </div>
+    <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-700">
+      <button id="btn-passenger" onclick="switchView('passenger')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition">Passenger</button>
+      <button id="btn-driver" onclick="switchView('driver')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 transition">Driver</button>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-xl mx-auto w-full p-4 space-y-4">
+    <!-- PASSENGER VIEW -->
+    <div id="view-passenger" class="space-y-4">
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl shadow-xl space-y-4">
+        <h2 class="text-lg font-bold">Book Your Trip</h2>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs text-slate-400">Pickup Location</label>
+            <input type="text" id="pickup" placeholder="Enter pickup point" value="Ngurubani Main Stage" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white mt-1 outline-none focus:border-emerald-500" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Destination</label>
+            <input type="text" id="destination" placeholder="Enter destination" value="Titanic Resort" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white mt-1 outline-none focus:border-emerald-500" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400">Calculated Distance (KM)</label>
+            <div class="relative">
+              <input type="number" id="distance" value="5" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-emerald-400 font-bold mt-1 outline-none cursor-not-allowed" />
+              <span id="route-loader" class="hidden absolute right-3 top-3.5 text-xs text-slate-500">Calculating...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-xs text-slate-400 uppercase tracking-wider">Select Vehicle Class</label>
+          <div id="tier-standard" onclick="selectTier('standard', 50)" class="p-3 rounded-xl border bg-emerald-500/10 border-emerald-500 cursor-pointer flex justify-between items-center">
             <div>
-                <h1 class="font-bold text-xl tracking-tight text-white">RideDirect</h1>
-                <p class="text-xs text-slate-400">Till: 1620547</p>
+              <p class="font-semibold text-sm">Standard Ride</p>
+              <p class="text-xs text-slate-400">Toyota Premio • Base Rate</p>
             </div>
-        </div>
-        <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-700">
-            <button id="btn-passenger" onclick="switchView('passenger')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition">Passenger</button>
-            <button id="btn-driver" onclick="switchView('driver')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 transition">Driver</button>
-        </div>
-    </header>
-
-    <main class="flex-1 max-w-xl mx-auto w-full p-4 space-y-4">
-        <!-- PASSENGER VIEW -->
-        <div id="view-passenger" class="space-y-4">
-            <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl shadow-xl space-y-4">
-                <h2 class="text-lg font-bold">Book Your Trip</h2>
-                
-                <div class="space-y-3">
-                    <div>
-                        <label class="text-xs text-slate-400">Pickup Location</label>
-                        <input type="text" id="pickup" placeholder="Enter pickup point" value="Ngurubani Main Stage" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white mt-1 outline-none focus:border-emerald-500" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-400">Destination</label>
-                        <input type="text" id="destination" placeholder="Enter destination" value="Titanic Resort" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white mt-1 outline-none focus:border-emerald-500" />
-                    </div>
-                    <div>
-                        <label class="text-xs text-slate-400">Calculated Distance (KM)</label>
-                        <div class="relative">
-                            <input type="number" id="distance" value="5" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-emerald-400 font-bold mt-1 outline-none cursor-not-allowed" />
-                            <span id="route-loader" class="hidden absolute right-3 top-3.5 text-xs text-slate-500">Calculating...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-xs text-slate-400 uppercase tracking-wider">Select Vehicle Class</label>
-                    <div id="tier-standard" onclick="selectTier('standard', 50)" class="p-3 rounded-xl border bg-emerald-500/10 border-emerald-500 cursor-pointer flex justify-between items-center">
-                        <div>
-                            <p class="font-semibold text-sm">Standard Ride</p>
-                            <p class="text-xs text-slate-400">Toyota Premio • Base Rate</p>
-                        </div>
-                        <span id="price-standard" class="font-bold text-emerald-400 text-base">KES 350</span>
-                    </div>
-                    <div id="tier-comfort" onclick="selectTier('comfort', 80)" class="p-3 rounded-xl border bg-slate-900/50 border-slate-700 hover:border-slate-600 cursor-pointer flex justify-between items-center">
-                        <div>
-                            <p class="font-semibold text-sm">Comfort Plus</p>
-                            <p class="text-xs text-slate-400">Spacious A/C Sedan</p>
-                        </div>
-                        <span id="price-comfort" class="font-bold text-emerald-400 text-base">KES 500</span>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700 text-xs flex justify-between items-center text-slate-300">
-                    <span>Lipa na M-PESA Buy Goods</span>
-                    <strong class="text-emerald-400">Till: 1620547</strong>
-                </div>
-
-                <button onclick="requestRide()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl transition shadow-lg text-sm">
-                    Request & Pay via M-PESA STK
-                </button>
+            <span id="price-standard" class="font-bold text-emerald-400 text-base">KES 350</span>
+          </div>
+          <div id="tier-comfort" onclick="selectTier('comfort', 80)" class="p-3 rounded-xl border bg-slate-900/50 border-slate-700 hover:border-slate-600 cursor-pointer flex justify-between items-center">
+            <div>
+              <p class="font-semibold text-sm">Comfort Plus</p>
+              <p class="text-xs text-slate-400">Spacious A/C Sedan</p>
             </div>
+            <span id="price-comfort" class="font-bold text-emerald-400 text-base">KES 500</span>
+          </div>
         </div>
 
-        <!-- DRIVER VIEW -->
-        <div id="view-driver" class="hidden space-y-4">
-            <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <div>
-                        <h2 class="text-lg font-bold">Driver Console</h2>
-                        <p class="text-xs text-slate-400">Toyota Premio • KDA 489X</p>
-                    </div>
-                    <button id="driver-status-btn" onclick="toggleDriverOnline()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-slate-950">
-                        ONLINE
-                    </button>
-                </div>
+        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700 text-xs flex justify-between items-center text-slate-300">
+          <span>Lipa na M-PESA Buy Goods</span>
+          <strong class="text-emerald-400">Till: 1620547</strong>
+        </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
-                        <span class="text-xs text-slate-400">Today's Total</span>
-                        <p id="driver-earnings" class="text-lg font-bold text-emerald-400 mt-0.5">KES 2,450</p>
-                    </div>
-                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
-                        <span class="text-xs text-slate-400">Trips Completed</span>
-                        <p id="driver-trips" class="text-lg font-bold text-white mt-0.5">4</p>
-                    </div>
-                </div>
+        <button onclick="requestRide()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl transition shadow-lg text-sm">
+          Request & Pay via M-PESA STK
+        </button>
+      </div>
+    </div>
 
-                <div class="space-y-2">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase">Recent Till Payments (1620547)</h3>
-                    <div id="payment-logs" class="space-y-2 text-xs">
-                        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700/60 flex justify-between items-center">
-                            <div>
-                                <p class="font-semibold text-white">QKH8819201</p>
-                                <p class="text-[10px] text-slate-400">0722***112 • Standard</p>
-                            </div>
-                            <span class="font-bold text-emerald-400">+ KES 350</span>
-                        </div>
-                    </div>
-                </div>
+    <!-- DRIVER VIEW -->
+    <div id="view-driver" class="hidden space-y-4">
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl shadow-xl space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+          <div>
+            <h2 class="text-lg font-bold">Driver Console</h2>
+            <p class="text-xs text-slate-400">Toyota Premio • KDA 489X</p>
+          </div>
+          <button id="driver-status-btn" onclick="toggleDriverOnline()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-slate-950">
+            ONLINE
+          </button>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
+            <span class="text-xs text-slate-400">Today's Total</span>
+            <p id="driver-earnings" class="text-lg font-bold text-emerald-400 mt-0.5">KES 2,450</p>
+          </div>
+          <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
+            <span class="text-xs text-slate-400">Trips Completed</span>
+            <p id="driver-trips" class="text-lg font-bold text-white mt-0.5">4</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-xs font-bold text-slate-400 uppercase">Recent Till Payments (1620547)</h3>
+          <div id="payment-logs" class="space-y-2 text-xs">
+            <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700/60 flex justify-between items-center">
+              <div>
+                <p class="font-semibold text-white">QKH8819201</p>
+                <p class="text-[10px] text-slate-400">0722***112 • Standard</p>
+              </div>
+              <span class="font-bold text-emerald-400">+ KES 350</span>
             </div>
+          </div>
         </div>
-    </main>
+      </div>
+    </div>
+  </main>
 
-    <script>
-        let baseFare = 100;
-        let perKmRate = 50;
-        let selectedTierType = 'standard';
-        let currentFare = 350;
-        let totalEarnings = 2450;
-        let totalTrips = 4;
-        let isOnline = true;
+  <script>
+    let baseFare = 100;
+    let perKmRate = 50;
+    let selectedTierType = 'standard';
+    let currentFare = 350;
+    let totalEarnings = 2450;
+    let totalTrips = 4;
+    let isOnline = true;
 
-        // View Switcher
-        function switchView(mode) {
-            const pView = document.getElementById('view-passenger');
-            const dView = document.getElementById('view-driver');
-            const pBtn = document.getElementById('btn-passenger');
-            const dBtn = document.getElementById('btn-driver');
-
-            if (mode === 'passenger') {
-                pView.classList.remove('hidden');
-                dView.classList.add('hidden');
-                pBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition";
-                dBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 transition";
-            } else {
-                dView.classList.remove('hidden');
-                pView.classList.add('hidden');
-                dBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition";
-                pBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 transition";
-            }
-        }
-
-        // Calculate Fare based on Distance
-        function calculateFare() {
-            const dist = parseFloat(document.getElementById('distance').value) || 0;
-            const stdPrice = baseFare + (dist * perKmRate);
-            const comPrice = baseFare + (dist * 80);
-
-            document.getElementById('price-standard').innerText = 'KES ' + stdPrice;
-            document.getElementById('price-comfort').innerText = 'KES ' + comPrice;
-
-            currentFare = selectedTierType === 'standard' ? stdPrice : comPrice;
-        }
-
-        // Vehicle Tier Selector
-        function selectTier(tier, rate) {
-            selectedTierType = tier;
-            perKmRate = rate;
-            const stdEl = document.getElementById('tier-standard');
-            const comEl = document.getElementById('tier-comfort');
-
-            if (tier === 'standard') {
-                stdEl.className = "p-3 rounded-xl border bg-emerald-500/10 border-emerald-500 cursor-pointer flex justify-between items-center";
-                comEl.className = "p-3 rounded-xl border bg-slate-900/50 border-slate-700 hover:border-slate-600 cursor-pointer flex justify-between items-center";
-            } else {
-                comEl.className = "p-3 rounded-xl border bg-emerald-500/10 border-emerald-500 cursor-pointer flex justify-between items-center";
-                stdEl.className = "p-3 rounded-xl border bg-slate-900/50 border-slate-700 hover:border-slate-600 cursor-pointer flex justify-between items-center";
-            }
-            calculateFare();
-        }
-
-        // Simulate Booking Request & M-PESA Trigger
-        function requestRide() {
-            alert('STK Push sent for KES ' + currentFare + ' to Till 1620547!');
-            totalEarnings += currentFare;
-            totalTrips += 1;
-            document.getElementById('driver-earnings').innerText = 'KES ' + totalEarnings.toLocaleString();
-            document.getElementById('driver-trips').innerText = totalTrips;
-
-            const logs = document.getElementById('payment-logs');
-            const ref = 'QKH' + Math.floor(1000000 + Math.random() * 9000000);
-            logs.innerHTML = `
-                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700/60 flex justify-between items-center">
-                    <div>
-                        <p class="font-semibold text-white">${ref}</p>
-                        <p class="text-[10px] text-slate-400">Just now • ${selectedTierType.toUpperCase()}</p>
-                    </div>
-                    <span class="font-bold text-emerald-400">+ KES ${currentFare}</span>
-                </div>
-            ` + logs.innerHTML;
-        }
-
-        // Toggle Driver Online Status
-        function toggleDriverOnline() {
-            isOnline = !isOnline;
-            const btn = document.getElementById('driver-status-btn');
-            if (isOnline) {
-                btn.innerText = 'ONLINE';
-                btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-slate-950";
-            } else {
-                btn.innerText = 'OFFLINE';
-                btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-600 text-white";
-            }
-        }
-
-        // Google Maps Places Autocomplete & Distance Matrix Integration
-        let pickupAutocomplete, destAutocomplete;
-
-        function initMapServices() {
-            const pickupInput = document.getElementById('pickup');
-            const destInput = document.getElementById('destination');
-
-            const options = {
-                componentRestrictions: { country: 'ke' }
-            };
-
-            pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, options);
-            destAutocomplete = new google.maps.places.Autocomplete(destInput, options);
-
-            pickupAutocomplete.addListener('place_changed', calculateRouteDistance);
-            destAutocomplete.addListener('place_changed', calculateRouteDistance);
-        }
-
-        function calculateRouteDistance() {
-            const origin = document.getElementById('pickup').value;
-            const destination = document.getElementById('destination').value;
-
-            if (!origin || !destination) return;
-
-            const loader = document.getElementById('route-loader');
-            if (loader) loader.classList.remove('hidden');
-
-            const service = new google.maps.DistanceMatrixService();
-            service.getDistanceMatrix({
-                origins: [origin],
-                destinations: [destination],
-                travelMode: google.maps.TravelMode.DRIVING,
-                unitSystem: google.maps.UnitSystem.METRIC
-            }, (response, status) => {
-                if (loader) loader.classList.add('hidden');
-
-                if (status === 'OK' && response.rows[0].elements[0].status === 'OK') {
-                    const distanceInMeters = response.rows[0].elements[0].distance.value;
-                    const distanceInKm = Math.ceil(distanceInMeters / 1000);
-
-                    document.getElementById('distance').value = distanceInKm;
-                    calculateFare();
-                }
-            });
-        }
-
-        window.addEventListener('load', () => {
-            if (typeof google !== 'undefined' && google.maps) {
-                initMapServices();
-            }
-        });
-    </script>
-</body>
-</html>
+    function switchView(mode) {
+      const pView = document.getElementById('view-passenger');
+      const dView = document.getElementById('view-driver');
+      const pBtn = document.getElementById('btn-passenger');
+      const dBtn = document.getElementById('btn-
